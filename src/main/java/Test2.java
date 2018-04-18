@@ -31,6 +31,11 @@ public class Test2 extends AbstractTest {
     private static Thread th() {
         return new Thread(() -> {
             // Правки можно внисить от этой линии
+                if (val.getAndSet(!val.get())) {
+                    put(1);
+                } else {
+                    put(2);
+                }
 
             // До этой
         });
