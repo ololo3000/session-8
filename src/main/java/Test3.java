@@ -50,12 +50,11 @@ public class Test3 extends AbstractTest {
                     put(3);
                     return;
                 }
-
-                if (val.compareAndSet(false, true)) {
+                if (local.compareAndSet(false, true)) {
                     put(1);
                 } else {
-                    local.set(false);
                     val = null;
+                    local.set(false);
                     put(2);
                 }
             }
