@@ -1,6 +1,4 @@
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.concurrent.atomic.AtomicReference;
 
 public class Test3 extends AbstractTest {
     private static volatile AtomicBoolean val = new AtomicBoolean();
