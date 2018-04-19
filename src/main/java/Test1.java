@@ -36,10 +36,8 @@ public class Test1 extends AbstractTest {
     private static Thread th() {
         return new Thread(() -> {
             // Правки можно внисить от этой линии
-            val.compareAndSet(0, 1);
-            val.compareAndSet(4, 1);
-            put(val.getAndIncrement());
-
+            val.compareAndSet(3, 0);
+            put(val.incrementAndGet());
             // До этой
         });
     }

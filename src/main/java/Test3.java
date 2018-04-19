@@ -38,26 +38,31 @@ public class Test3 extends AbstractTest {
             // Правки можно внисить от этой линии
             AtomicBoolean local = val;
 
-            if (local == null) {
-                val = new AtomicBoolean(false);
+            if (local.compareAndSet(false, true)) {
+                while(val != null) {
+                }
+                if (local.compareAndSet(true, false)) {
+                    put(1);
+                    return;
+                }
                 put(3);
+                val = local;
                 return;
             }
 
-            synchronized (local) {
-                if (val == null) {
-                    val = local;
-                    put(3);
-                    return;
+            if (local.compareAndSet(true,  false)) {
+                while(!local.get()) {
                 }
-                if (local.compareAndSet(false, true)) {
-                    put(1);
-                } else {
-                    val = null;
-                    local.set(false);
-                    put(2);
-                }
+                val = null;
+                put(2);
+                return;
             }
+
+            local.set(true);
+            put(3);
+            while (local.get()) {
+            }
+            val = local;
             // До этой
         });
     }
