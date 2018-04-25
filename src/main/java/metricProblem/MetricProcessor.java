@@ -1,38 +1,56 @@
 package metricProblem;
 
+import java.util.Map;
+import java.util.Queue;
+
 public class MetricProcessor implements Runnable {
+    private static final long TIME_TO_PROCESS = 1000;
+    private Map<String, Metric> metricsStore;
+    private Queue<Event> eventQueue;
+
+    public MetricProcessor(Queue<Event> eventQueue, Map<String, Metric> metricsStore) {
+        this.metricsStore = metricsStore;
+        this.eventQueue = eventQueue;
+    }
 
     @Override
     public void run() {
         while (true) {
-            int size = EventQueue.getInstance().size();
+            long started = System.currentTimeMillis();
 
-            for (int i = 0; i < size; i++) {
-                Event event = EventQueue.getInstance().poll();
+            while (true) {
+                Event event = eventQueue.poll();
 
                 if (event == null) {
                     break;
                 }
 
-                if (MetricsStore.getInstance().containsKey(event.getType())) {
-                    Metric metric = MetricsStore.getInstance().get(event.getType());
-                    MetricsStore.getInstance().put(metric.getType(),
-                            new Metric(metric.getSum() + event.getValue(),
-                                    metric.getCount() + 1,
-                                    metric.getType()));
-                } else {
-                    MetricsStore.getInstance().put(event.getType(),
-                            new Metric(event.getValue(),
-                                    1,
-                                    event.getType()));
+                if (event.getTimeStamp() > started) {
+                    break;
                 }
+
+                metricsStore.putIfAbsent(event.getType(),
+                        new Metric(event.getValue(), 0, event.getType()));
+
+                Metric oldMetric = metricsStore.get(event.getType());
+                Metric newMetric = new Metric(oldMetric.getSum() + event.getValue(),
+                        oldMetric.getCount() + 1,
+                        oldMetric.getType());
+
+                metricsStore.put(oldMetric.getType(), newMetric);
+
             }
 
-            try {
-                Thread.sleep(1000);
-            } catch (InterruptedException e) {
-                System.out.println("Interrupted");
+            long elapsed = System.currentTimeMillis() - started;
+
+            if (elapsed < TIME_TO_PROCESS) {
+                try {
+                    Thread.sleep(TIME_TO_PROCESS - elapsed);
+                } catch (InterruptedException e) {
+                    throw new RuntimeException(e);
+                }
             }
         }
     }
 }
+

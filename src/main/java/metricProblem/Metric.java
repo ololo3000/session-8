@@ -23,7 +23,7 @@ public class Metric {
         return this.count;
     }
 
-    public long getAverage() {
-        return sum / count;
+    public float getAverage() {
+        return (float) sum / count;
     }
 }

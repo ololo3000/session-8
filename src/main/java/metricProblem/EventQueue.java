@@ -1,12 +1,12 @@
 package metricProblem;
 
-import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.LinkedBlockingQueue;
+import java.util.Queue;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 public class EventQueue {
-    private static final BlockingQueue<Event> instance = new LinkedBlockingQueue();
+    private static final Queue<Event> instance = new ConcurrentLinkedQueue<>();
 
-    public static BlockingQueue<Event> getInstance() {
+    public static Queue<Event> getInstance() {
         return instance;
     }
 }
