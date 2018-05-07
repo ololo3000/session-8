@@ -1,7 +1,9 @@
 package metricProblem;
 
+import java.util.Calendar;
 import java.util.Map;
 import java.util.Queue;
+import java.util.concurrent.ConcurrentMap;
 
 public class MetricProcessor implements Runnable {
     private static final long TIME_TO_PROCESS = 1000;
@@ -29,16 +31,12 @@ public class MetricProcessor implements Runnable {
                     break;
                 }
 
-                metricsStore.putIfAbsent(event.getType(),
-                        new Metric(event.getValue(), 0, event.getType()));
+                if (!metricsStore.containsKey(event.getType())) {
+                    metricsStore.putIfAbsent(event.getType(),
+                            new Metric(event.getType()));
+                }
 
-                Metric oldMetric = metricsStore.get(event.getType());
-                Metric newMetric = new Metric(oldMetric.getSum() + event.getValue(),
-                        oldMetric.getCount() + 1,
-                        oldMetric.getType());
-
-                metricsStore.put(oldMetric.getType(), newMetric);
-
+                metricsStore.get(event.getType()).addEvent(event);
             }
 
             long elapsed = System.currentTimeMillis() - started;

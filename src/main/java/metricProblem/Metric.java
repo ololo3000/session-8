@@ -1,14 +1,24 @@
 package metricProblem;
 
-public class Metric {
-    private final long sum;
-    private final long count;
-    private final String type;
+import java.util.concurrent.atomic.AtomicLong;
 
-    public Metric(long sum, long count, String type) {
+public class Metric {
+    private final String type;
+    private final AtomicLong eventCnt = new AtomicLong(0);
+    private final AtomicLong eventValsSum = new AtomicLong(0);
+
+    public boolean addEvent(Event event) {
+        if (!event.getType().equals(type)) {
+            return false;
+        }
+
+        eventCnt.getAndIncrement();
+        eventValsSum.getAndAdd(event.getValue());
+        return true;
+    }
+
+    public Metric(String type) {
         this.type = type;
-        this.count = count;
-        this.sum = sum;
     }
 
     public String getType() {
@@ -16,14 +26,14 @@ public class Metric {
     }
 
     public long getSum() {
-        return this.sum;
+        return this.eventValsSum.get();
     }
 
-    public long getCount() {
-        return this.count;
+    public long getEventCount() {
+        return this.eventCnt.get();
     }
 
     public float getAverage() {
-        return (float) sum / count;
+        return (float) eventValsSum.get() / eventCnt.get();
     }
 }
